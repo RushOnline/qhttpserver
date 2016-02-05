@@ -1,4 +1,5 @@
-include(../qhttpserver.pri)
+LIBDIR = $${INSTALL_ROOT}$${PREFIX}/lib
+INCLUDEDIR = $${INSTALL_ROOT}$${PREFIX}/include
 
 QHTTPSERVER_BASE = ..
 TEMPLATE = lib
@@ -31,7 +32,10 @@ OBJECTS_DIR = $$QHTTPSERVER_BASE/build
 MOC_DIR = $$QHTTPSERVER_BASE/build
 DESTDIR = $$QHTTPSERVER_BASE/lib
 
-target.path = $$LIBDIR
-headers.path = $$INCLUDEDIR
-headers.files = $$PUBLIC_HEADERS
 INSTALLS += target headers
+
+include(../common/settings.pri)
+
+target.path = $$LIBDIR
+headers.path = $$INCDIR
+headers.files = $$PUBLIC_HEADERS
