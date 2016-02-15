@@ -46,8 +46,8 @@ class QHTTPSERVER_API QHttpRequest : public QObject
     Q_PROPERTY(HeaderHash headers READ headers)
     Q_PROPERTY(QString remoteAddress READ remoteAddress)
     Q_PROPERTY(quint16 remotePort READ remotePort)
-    Q_PROPERTY(QString method READ method)
-    Q_PROPERTY(QUrl url READ url)
+    Q_PROPERTY(QString method READ methodString)
+    Q_PROPERTY(QString url READ urlString)
     Q_PROPERTY(QString path READ path)
     Q_PROPERTY(QString httpVersion READ httpVersion)
 
@@ -95,6 +95,7 @@ public:
         HTTP_PATCH,
         HTTP_PURGE
     };
+    Q_ENUMS(HttpMethod)
 
     /// The method used for the request.
     HttpMethod method() const;
@@ -107,6 +108,9 @@ public:
     /** This includes the path and query string.
         @sa path() */
     const QUrl &url() const;
+
+    /// URL in text form
+    const QString urlString() const;
 
     /// The path portion of the query URL.
     /** @sa url() */

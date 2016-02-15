@@ -48,6 +48,11 @@ const QString &QHttpRequest::httpVersion() const
     return m_version;
 }
 
+const QString QHttpRequest::urlString() const
+{
+    return m_url.toString();
+}
+
 const QUrl &QHttpRequest::url() const
 {
     return m_url;
