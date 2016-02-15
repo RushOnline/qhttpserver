@@ -29,12 +29,12 @@ void Greeting::handleRequest(QHttpRequest *req, QHttpResponse *resp)
         
         QString name = exp.capturedTexts()[1];
         QString body = tr("<html><head><title>Greeting App</title></head><body><h1>Hello %1!</h1></body></html>");
-        resp->end(body.arg(name).toUtf8());
+        resp->end(body.arg(name));
     }
     else
     {
         resp->writeHead(403);
-        resp->end(QByteArray("You aren't allowed here!"));
+        resp->end("You aren't allowed here!");
     }
 }
 

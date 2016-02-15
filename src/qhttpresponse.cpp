@@ -146,7 +146,7 @@ void QHttpResponse::writeHead(StatusCode statusCode)
     writeHead(static_cast<int>(statusCode));
 }
 
-void QHttpResponse::write(const QByteArray &data)
+void QHttpResponse::writeA(const QByteArray &data)
 {
     if (m_finished) {
         qWarning() << "QHttpResponse::write() Cannot write body after response has finished.";
@@ -161,6 +161,11 @@ void QHttpResponse::write(const QByteArray &data)
     m_connection->write(data);
 }
 
+void QHttpResponse::write(const QString &data)
+{
+    writeA(data.toUtf8());
+}
+
 void QHttpResponse::flush()
 {
     m_connection->flush();
@@ -171,7 +176,7 @@ void QHttpResponse::waitForBytesWritten()
     m_connection->waitForBytesWritten();
 }
 
-void QHttpResponse::end(const QByteArray &data)
+void QHttpResponse::endA(const QByteArray &data)
 {
     if (m_finished) {
         qWarning() << "QHttpResponse::end() Cannot write end after response has finished.";
@@ -179,13 +184,18 @@ void QHttpResponse::end(const QByteArray &data)
     }
 
     if (data.size() > 0)
-        write(data);
+        writeA(data);
     m_finished = true;
 
     Q_EMIT done();
 
     /// @todo End connection and delete ourselves. Is this a still valid note?
     deleteLater();
+}
+
+void QHttpResponse::end(const QString &data)
+{
+    endA(data.toUtf8());
 }
 
 void QHttpResponse::connectionClosed()

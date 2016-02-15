@@ -111,7 +111,8 @@ public Q_SLOTS:
 
     /// Writes a block of @c data to the client.
     /** @note writeHead() must be called before this function. */
-    void write(const QByteArray &data);
+    void writeA(const QByteArray &data);
+    void write(const QString &data);
 
     /// Flushes the written data to the client.
     /** @note writeHead() must be called before this function. */
@@ -129,7 +130,8 @@ public Q_SLOTS:
         This will emit done() and queue this object
         for deletion. For details see \ref memorymanagement.
         @param data Optional data to be written before finishing. */
-    void end(const QByteArray &data = "");
+    void endA(const QByteArray &data = "");
+    void end(const QString &data = "");
 
 Q_SIGNALS:
     /// Emitted when all the data has been sent
