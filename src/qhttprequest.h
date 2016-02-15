@@ -50,6 +50,7 @@ class QHTTPSERVER_API QHttpRequest : public QObject
     Q_PROPERTY(QString url READ urlString)
     Q_PROPERTY(QString path READ path)
     Q_PROPERTY(QString httpVersion READ httpVersion)
+    Q_PROPERTY(QString body READ bodyString)
 
     Q_ENUMS(HttpMethod)
 
@@ -145,6 +146,11 @@ public:
     const QByteArray &body() const
     {
         return m_body;
+    }
+
+    const QString bodyString() const
+    {
+        return QString::fromUtf8(m_body);
     }
 
     /// If this request was successfully received.
