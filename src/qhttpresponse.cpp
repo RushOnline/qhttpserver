@@ -51,10 +51,13 @@ QHttpResponse::~QHttpResponse()
 
 void QHttpResponse::setHeader(const QString &field, const QString &value)
 {
-    if (!m_finished)
+    if (!m_finished) {
         m_headers[field] = value;
-    else
+        if (field.compare("Content-Length", Qt::CaseInsensitive) == 0)
+        m_sentContentLengthHeader = true;
+    } else {
         qWarning() << "QHttpResponse::setHeader() Cannot set headers after response has finished.";
+    }
 }
 
 void QHttpResponse::writeHeader(const char *field, const QString &value)
@@ -86,9 +89,7 @@ void QHttpResponse::writeHeaders()
             m_sentTransferEncodingHeader = true;
             if (value.compare("chunked", Qt::CaseInsensitive) == 0)
                 m_useChunkedEncoding = true;
-        } else if (name.compare("content-length", Qt::CaseInsensitive) == 0)
-            m_sentContentLengthHeader = true;
-        else if (name.compare("date", Qt::CaseInsensitive) == 0)
+        } else if (name.compare("date", Qt::CaseInsensitive) == 0)
             m_sentDate = true;
 
         /// @todo Expect case (??)
@@ -158,7 +159,13 @@ void QHttpResponse::writeA(const QByteArray &data)
         return;
     }
 
-    m_connection->write(data);
+    if (data.size()) {
+        if (m_sentContentLengthHeader) {
+            m_connection->write(data);
+        } else {
+            m_buffer += data;
+        }
+    }
 }
 
 void QHttpResponse::write(const QString &data)
@@ -183,8 +190,14 @@ void QHttpResponse::endA(const QByteArray &data)
         return;
     }
 
-    if (data.size() > 0)
-        writeA(data);
+    m_buffer += data;
+    if (!m_sentContentLengthHeader) {
+        setHeader("Content-Length", QString("%1").arg(m_buffer.size()));
+        writeHeaders();
+    }
+
+    writeA(data);
+
     m_finished = true;
 
     Q_EMIT done();

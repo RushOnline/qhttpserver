@@ -157,6 +157,8 @@ private:
 
     HeaderHash m_headers;
 
+    QByteArray m_buffer;
+
     bool m_headerWritten;
     bool m_sentConnectionHeader;
     bool m_sentContentLengthHeader;
