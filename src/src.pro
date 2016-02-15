@@ -1,6 +1,3 @@
-LIBDIR = $${INSTALL_ROOT}$${PREFIX}/lib
-INCLUDEDIR = $${INSTALL_ROOT}$${PREFIX}/include
-
 QHTTPSERVER_BASE = ..
 TEMPLATE = lib
 
@@ -11,11 +8,9 @@ TARGET = qhttpserver
 QT += network
 QT -= gui
 
-CONFIG += dll debug_and_release
-
-CONFIG(debug, debug|release) {
-    win32: TARGET = $$join(TARGET,,,d)
-}
+#CONFIG(debug, debug|release) {
+#    win32: TARGET = $$join(TARGET,,,d)
+#}
 
 DEFINES += QHTTPSERVER_EXPORT
 
@@ -34,7 +29,7 @@ DESTDIR = $$QHTTPSERVER_BASE/lib
 
 INSTALLS += target headers
 
-include(../common/settings.pri)
+include($$QHTTPSERVER_BASE/common/settings.pri)
 
 target.path = $$LIBDIR
 headers.path = $$INCDIR
