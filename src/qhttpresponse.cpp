@@ -52,9 +52,12 @@ QHttpResponse::~QHttpResponse()
 void QHttpResponse::setHeader(const QString &field, const QString &value)
 {
     if (!m_finished) {
-        m_headers[field] = value;
-        if (field.compare("Content-Length", Qt::CaseInsensitive) == 0)
-        m_sentContentLengthHeader = true;
+        if (value.isEmpty()) {
+            m_headers.remove(value);        // remove header if value is empty
+        } else {
+            m_headers[field] = value;
+        }
+        if (field.compare("Content-Length", Qt::CaseInsensitive) == 0) m_sentContentLengthHeader = true;
     } else {
         qWarning() << "QHttpResponse::setHeader() Cannot set headers after response has finished.";
     }
@@ -147,7 +150,7 @@ void QHttpResponse::writeHead(StatusCode statusCode)
     writeHead(static_cast<int>(statusCode));
 }
 
-void QHttpResponse::writeA(const QByteArray &data)
+void QHttpResponse::writeByteArray(const QByteArray &data)
 {
     if (m_finished) {
         qWarning() << "QHttpResponse::write() Cannot write body after response has finished.";
@@ -170,7 +173,7 @@ void QHttpResponse::writeA(const QByteArray &data)
 
 void QHttpResponse::write(const QString &data)
 {
-    writeA(data.toUtf8());
+    writeByteArray(data.toUtf8());
 }
 
 void QHttpResponse::flush()
@@ -183,20 +186,20 @@ void QHttpResponse::waitForBytesWritten()
     m_connection->waitForBytesWritten();
 }
 
-void QHttpResponse::endA(const QByteArray &data)
+void QHttpResponse::endByteArray(const QByteArray &data)
 {
     if (m_finished) {
         qWarning() << "QHttpResponse::end() Cannot write end after response has finished.";
         return;
     }
 
-    m_buffer += data;
+    // Autodetect content length. User can disable this default behavior calling setHeader("Content-Length", "");
     if (!m_sentContentLengthHeader) {
-        setHeader("Content-Length", QString("%1").arg(m_buffer.size()));
+        setHeader("Content-Length", QString("%1").arg(data.size() + m_buffer.size()));
         writeHeaders();
     }
 
-    writeA(data);
+    writeByteArray(data);
 
     m_finished = true;
 
@@ -208,7 +211,7 @@ void QHttpResponse::endA(const QByteArray &data)
 
 void QHttpResponse::end(const QString &data)
 {
-    endA(data.toUtf8());
+    endByteArray(data.toUtf8());
 }
 
 void QHttpResponse::connectionClosed()

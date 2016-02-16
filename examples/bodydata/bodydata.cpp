@@ -58,7 +58,7 @@ Responder::~Responder()
 
 void Responder::accumulate(const QByteArray &data)
 {
-    m_resp->writeA(data);
+    m_resp->writeByteArray(data);
 }
 
 void Responder::reply()

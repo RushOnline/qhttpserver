@@ -24,7 +24,7 @@ void HelloWorld::handleRequest(QHttpRequest *req, QHttpResponse *resp)
     QByteArray body = "Hello World";
     resp->setHeader("Content-Length", QString::number(body.size()));
     resp->writeHead(200);
-    resp->endA(body);
+    resp->endByteArray(body);
 }
 
 /// main
