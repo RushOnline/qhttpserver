@@ -79,8 +79,10 @@ void QHttpConnection::socketDisconnected()
 
 void QHttpConnection::invalidateRequest()
 {
-    if (m_request && !m_request->successful()) {
-        Q_EMIT m_request->end();
+    if (m_request) {
+        if (!m_request->successful()) {
+            Q_EMIT m_request->completed();
+        }
     }
 
     m_request = NULL;
@@ -242,7 +244,7 @@ int QHttpConnection::MessageComplete(http_parser *parser)
     Q_ASSERT(theConnection->m_request);
 
     theConnection->m_request->setSuccessful(true);
-    Q_EMIT theConnection->m_request->end();
+    Q_EMIT theConnection->m_request->completed();
     return 0;
 }
 

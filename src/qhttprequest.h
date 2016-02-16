@@ -182,7 +182,7 @@ Q_SIGNALS:
 
     /// Emitted when the request has been fully received.
     /** @note The no more data() signals will be emitted after this. */
-    void end();
+    void completed();
 
 private Q_SLOTS:
     void appendBody(const QByteArray &body);
