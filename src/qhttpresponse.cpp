@@ -42,7 +42,6 @@ QHttpResponse::QHttpResponse(QHttpConnection *connection)
       m_useChunkedEncoding(false),
       m_finished(false)
 {
-   connect(m_connection, SIGNAL(allBytesWritten()), this, SIGNAL(allBytesWritten()));
 }
 
 QHttpResponse::~QHttpResponse()
@@ -201,12 +200,7 @@ void QHttpResponse::endByteArray(const QByteArray &data)
 
     writeByteArray(data);
 
-    m_finished = true;
-
-    Q_EMIT done();
-
-    /// @todo End connection and delete ourselves. Is this a still valid note?
-    deleteLater();
+    connectionClosed();
 }
 
 void QHttpResponse::end(const QString &data)

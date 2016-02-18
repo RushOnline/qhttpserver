@@ -44,14 +44,12 @@ public:
 
 Q_SIGNALS:
     void newRequest(QHttpRequest *, QHttpResponse *);
-    void allBytesWritten();
 
 private Q_SLOTS:
     void parseRequest();
     void responseDone();
     void socketDisconnected();
     void invalidateRequest();
-    void updateWriteCount(qint64);
 
 private:
     static int MessageBegin(http_parser *parser);
@@ -76,9 +74,6 @@ private:
     QString m_currentHeaderField;
     QString m_currentHeaderValue;
 
-    // Keep track of transmit buffer status
-    qint64 m_transmitLen;
-    qint64 m_transmitPos;
 };
 
 /// @endcond

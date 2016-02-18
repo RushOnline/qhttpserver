@@ -36,9 +36,7 @@ QHttpConnection::QHttpConnection(QTcpSocket *socket, QObject *parent)
       m_socket(socket),
       m_parser(0),
       m_parserSettings(0),
-      m_request(0),
-      m_transmitLen(0),
-      m_transmitPos(0)
+      m_request(0)
 {
     m_parser = (http_parser *)malloc(sizeof(http_parser));
     http_parser_init(m_parser, HTTP_REQUEST);
@@ -56,7 +54,6 @@ QHttpConnection::QHttpConnection(QTcpSocket *socket, QObject *parent)
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(parseRequest()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
-    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(updateWriteCount(qint64)));
 }
 
 QHttpConnection::~QHttpConnection()
@@ -88,26 +85,13 @@ void QHttpConnection::invalidateRequest()
     m_request = NULL;
 }
 
-void QHttpConnection::updateWriteCount(qint64 count)
-{
-    Q_ASSERT(m_transmitPos + count <= m_transmitLen);
-
-    m_transmitPos += count;
-
-    if (m_transmitPos == m_transmitLen)
-    {
-        m_transmitLen = 0;
-        m_transmitPos = 0;
-        Q_EMIT allBytesWritten();
-    }
-}
-
 void QHttpConnection::parseRequest()
 {
     Q_ASSERT(m_parser);
 
     while (m_socket->bytesAvailable()) {
         QByteArray arr = m_socket->readAll();
+        qDebug() << "* " << arr;
         http_parser_execute(m_parser, m_parserSettings, arr.constData(), arr.size());
     }
 }
@@ -115,7 +99,6 @@ void QHttpConnection::parseRequest()
 void QHttpConnection::write(const QByteArray &data)
 {
     m_socket->write(data);
-    m_transmitLen += data.size();
 }
 
 void QHttpConnection::flush()
