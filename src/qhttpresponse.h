@@ -161,6 +161,7 @@ private:
     bool m_last;
     bool m_useChunkedEncoding;
     bool m_finished;
+    bool m_headers_sent;
 
 private Q_SLOTS:
     void connectionClosed();

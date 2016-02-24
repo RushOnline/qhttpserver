@@ -40,7 +40,8 @@ QHttpResponse::QHttpResponse(QHttpConnection *connection)
       m_keepAlive(true),
       m_last(false),
       m_useChunkedEncoding(false),
-      m_finished(false)
+      m_finished(false),
+      m_headers_sent(false)
 {
 }
 
@@ -78,6 +79,11 @@ void QHttpResponse::writeHeaders()
 {
     if (m_finished)
         return;
+
+    if (m_headers_sent) {
+        qWarning() << "headers was already sent";
+        return;
+    }
 
     foreach(const QString & name, m_headers.keys()) {
         QString value = m_headers[name];
@@ -121,6 +127,10 @@ void QHttpResponse::writeHeaders()
         writeHeader("Date",
                     QLocale::c().toString(QDateTime::currentDateTimeUtc(),
                                           "ddd, dd MMM yyyy hh:mm:ss") + " GMT");
+
+    m_connection->write("\r\n");
+
+    m_headers_sent = true;
 }
 
 void QHttpResponse::writeHead(int status)
@@ -138,8 +148,6 @@ void QHttpResponse::writeHead(int status)
 
     m_connection->write(
         QString("HTTP/1.1 %1 %2\r\n").arg(status).arg(STATUS_CODES[status]).toLatin1());
-    writeHeaders();
-    m_connection->write("\r\n");
 
     m_headerWritten = true;
 }
@@ -195,6 +203,9 @@ void QHttpResponse::endByteArray(const QByteArray &data)
     // Autodetect content length. User can disable this default behavior calling setHeader("Content-Length", "");
     if (!m_sentContentLengthHeader) {
         setHeader("Content-Length", QString("%1").arg(data.size() + m_buffer.size()));
+    }
+
+    if (!m_headers_sent) {
         writeHeaders();
     }
 
